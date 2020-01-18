@@ -1,6 +1,3 @@
-from math import floor
-from random import randint
-
 import numpy as np
 from cv2 import cv2
 
@@ -11,19 +8,18 @@ fix_proportion: bool = False
 offset: int = 0
 
 
-def _denoise_decrypted_image(img: np.ndarray):
+def _denoise_decrypted_image(img: np.ndarray) -> None:
     i: int = 0
-    shape_0: int = img.shape[0]
-    shape_1: int = img.shape[1]
+    rows, cols = img.shape
     pixel_sum: int
-    half_pixel_sum_value: int = 255 * int(shape_1 / 2)
 
-    while i < shape_0:
-        if img[i].sum() == half_pixel_sum_value:
-            img[i, 0:shape_1] = 0
-        elif not np.all(img[i]):
+    while i < rows:
+        non_zero_count: int = cv2.countNonZero(img[i])
+        if non_zero_count == int(cols / 2):
+            img[i, 0:cols] = 0
+        elif non_zero_count != cols:
             j: int = 0
-            while j < shape_1:
+            while j < cols:
                 if img[i, j] != img[i, j + 1]:
                     img[i, j:j + 2] = 0
                 j += 2
@@ -44,6 +40,8 @@ def decrypt(share_1: np.ndarray, share_2: np.ndarray, denoise: bool = True, fix_
 
 
 def _fill_shares(src: np.ndarray, share_1: np.ndarray, share_2: np.ndarray):
+    from random import randint
+
     i: int = 0
     while i < src.shape[0]:
         j: int = 0
@@ -73,8 +71,11 @@ def _overlap_shares(share_1: np.ndarray, share_2: np.ndarray, value: int):
 
 
 def _show_overlapped_shares():
+    from math import floor
     global share_1_global, share_2_global, denoise, fix_proportion, offset
+
     overlapped_shares: np.ndarray = _overlap_shares(share_1_global, share_2_global, offset)
+
     if denoise:
         _denoise_decrypted_image(overlapped_shares)
     if fix_proportion:
@@ -85,7 +86,7 @@ def _show_overlapped_shares():
     if border_size > 0:
         overlapped_shares = cv2.copyMakeBorder(overlapped_shares, 0, 0, border_size, border_size, cv2.BORDER_CONSTANT)
 
-    cv2.imshow("application", overlapped_shares)
+    cv2.imshow("Visual cryptography", overlapped_shares)
 
 
 def _callback_1(value: int):
@@ -112,10 +113,10 @@ def _create_share_overlap_window(share_1, share_2):
     share_1_global = share_1
     share_2_global = share_2
 
-    cv2.namedWindow("application")
-    cv2.createTrackbar("Overlap", "application", 0, share_1.shape[0], _callback_1)
-    cv2.createTrackbar("Denoise", "application", 0, 1, _callback_2)
-    cv2.createTrackbar("Fix proportions", "application", 0, 1, _callback_3)
+    cv2.namedWindow("Visual cryptography")
+    cv2.createTrackbar("Overlap", "Visual cryptography", 0, share_1.shape[0], _callback_1)
+    cv2.createTrackbar("Denoise", "Visual cryptography", 0, 1, _callback_2)
+    cv2.createTrackbar("Fix proportions", "Visual cryptography", 0, 1, _callback_3)
     _show_overlapped_shares()
 
     cv2.waitKey()
