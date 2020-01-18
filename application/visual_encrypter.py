@@ -1,7 +1,8 @@
-import numpy as np
-from cv2 import cv2
 from math import floor
 from random import randint
+
+import numpy as np
+from cv2 import cv2
 
 share_1_global: np.ndarray
 share_2_global: np.ndarray
@@ -106,7 +107,7 @@ def _callback_3(value: bool):
 
 
 def _create_share_overlap_window(share_1, share_2):
-    global share_1_global, share_2_global
+    global share_1_global, share_2_global, denoise, fix_proportion, offset
 
     share_1_global = share_1
     share_2_global = share_2
@@ -119,6 +120,9 @@ def _create_share_overlap_window(share_1, share_2):
 
     cv2.waitKey()
     cv2.destroyAllWindows()
+    denoise = False
+    fix_proportion = False
+    offset = 0
 
 
 def _create_shares(src):
