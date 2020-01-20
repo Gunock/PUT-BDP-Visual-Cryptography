@@ -3,7 +3,7 @@
 import tkinter as tk
 
 
-class PrimeGeneratorApplication(tk.Frame):
+class VisualEncrypterApplication(tk.Frame):
     """Application for prime generator"""
 
     def __init__(self, master=None):
@@ -43,5 +43,5 @@ class PrimeGeneratorApplication(tk.Frame):
 if __name__ == "__main__":
     root = tk.Tk()
     root.title("Visual encryption")
-    app = PrimeGeneratorApplication(master=root)
+    app = VisualEncrypterApplication(master=root)
     app.mainloop()
